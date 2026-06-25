@@ -9,9 +9,11 @@ const supabase = createClient(
 export const revalidate = 30;
 
 export default async function Home() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  
   const [{ data: resources }, discordRes] = await Promise.all([
     supabase.from("resources").select("*").order("created_at", { ascending: false }),
-    fetch("http://localhost:3000/api/discord-stats", { cache: "no-store" }),
+    fetch(`${siteUrl}/api/discord-stats`, { cache: "no-store" }),
   ]);
 
   const discord = await discordRes.json();
@@ -35,8 +37,8 @@ export default async function Home() {
 
       <div className="px-6 mb-6 grid grid-cols-5 gap-3">
         {[
-          { label: "TOTAL USERS", value: discord.members.toLocaleString() },
-          { label: "ONLINE NOW", value: discord.online.toLocaleString() },
+          { label: "TOTAL USERS", value: discord.members?.toLocaleString() || "0" },
+          { label: "ONLINE NOW", value: discord.online?.toLocaleString() || "0" },
           { label: "DOWNLOADS", value: list.reduce((sum: number, r: any) => sum + (r.downloads || 0), 0).toLocaleString() },
           { label: "RESOURCES", value: list.length.toString() },
         ].map((s) => (
