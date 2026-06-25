@@ -1,0 +1,134 @@
+"use client";
+import { useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export default function AdminPage() {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("Scripts");
+  const [price, setPrice] = useState("0");
+  const [isFree, setIsFree] = useState(true);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [downloadFile, setDownloadFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  async function handleSubmit() {
+    if (!title || !downloadFile) return alert("Βάλε τίτλο και αρχείο!");
+    setLoading(true);
+
+    let imageUrl = "";
+    let downloadUrl = "";
+
+    if (imageFile) {
+      const { data } = await supabase.storage
+        .from("resources")
+        .upload(`images/${Date.now()}_${imageFile.name}`, imageFile);
+      if (data) {
+        const { data: urlData } = supabase.storage.from("resources").getPublicUrl(data.path);
+        imageUrl = urlData.publicUrl;
+      }
+    }
+
+    const { data: fileData } = await supabase.storage
+      .from("resources")
+      .upload(`files/${Date.now()}_${downloadFile.name}`, downloadFile);
+    if (fileData) {
+      const { data: urlData } = supabase.storage.from("resources").getPublicUrl(fileData.path);
+      downloadUrl = urlData.publicUrl;
+    }
+
+    await supabase.from("resources").insert({
+      title,
+      description,
+      category,
+      price: parseFloat(price),
+      is_free: isFree,
+      image_url: imageUrl,
+      download_url: downloadUrl,
+      downloads: 0,
+    });
+
+    setLoading(false);
+    setSuccess(true);
+    setTitle("");
+    setDescription("");
+    setPrice("0");
+    setImageFile(null);
+    setDownloadFile(null);
+  }
+
+  return (
+    <main className="min-h-screen bg-[#0d0d0d] text-white p-8">
+      <h1 className="text-2xl font-black text-yellow-400 mb-8">Admin Panel</h1>
+
+      {success && (
+        <div className="bg-green-900 text-green-400 px-4 py-3 rounded mb-6">
+          ✅ Resource ανέβηκε επιτυχώς!
+        </div>
+      )}
+
+      <div className="max-w-xl space-y-4">
+        <div>
+          <label className="text-gray-400 text-sm mb-1 block">Τίτλος</label>
+          <input value={title} onChange={e => setTitle(e.target.value)}
+            className="w-full bg-[#111] border border-[#222] rounded px-3 py-2 text-white focus:outline-none focus:border-yellow-400"
+            placeholder="π.χ. Downtown Map" />
+        </div>
+
+        <div>
+          <label className="text-gray-400 text-sm mb-1 block">Περιγραφή</label>
+          <textarea value={description} onChange={e => setDescription(e.target.value)}
+            className="w-full bg-[#111] border border-[#222] rounded px-3 py-2 text-white focus:outline-none focus:border-yellow-400 h-24"
+            placeholder="Περιγραφή του resource..." />
+        </div>
+
+        <div>
+          <label className="text-gray-400 text-sm mb-1 block">Κατηγορία</label>
+          <select value={category} onChange={e => setCategory(e.target.value)}
+            className="w-full bg-[#111] border border-[#222] rounded px-3 py-2 text-white focus:outline-none">
+            {["Scripts", "MLO", "Vehicles", "Clothing", "Maps"].map(c => (
+              <option key={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <label className="text-gray-400 text-sm mb-1 block">Τιμή (€)</label>
+            <input value={price} onChange={e => setPrice(e.target.value)}
+              type="number" min="0"
+              className="w-full bg-[#111] border border-[#222] rounded px-3 py-2 text-white focus:outline-none focus:border-yellow-400"
+              placeholder="0" />
+          </div>
+          <div className="flex items-end pb-2 gap-2">
+            <input type="checkbox" checked={isFree} onChange={e => setIsFree(e.target.checked)} id="free" />
+            <label htmlFor="free" className="text-gray-400 text-sm">Free</label>
+          </div>
+        </div>
+
+        <div>
+          <label className="text-gray-400 text-sm mb-1 block">Εικόνα Preview</label>
+          <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files?.[0] || null)}
+            className="w-full bg-[#111] border border-[#222] rounded px-3 py-2 text-gray-400 text-sm" />
+        </div>
+
+        <div>
+          <label className="text-gray-400 text-sm mb-1 block">Αρχείο Download</label>
+          <input type="file" onChange={e => setDownloadFile(e.target.files?.[0] || null)}
+            className="w-full bg-[#111] border border-[#222] rounded px-3 py-2 text-gray-400 text-sm" />
+        </div>
+
+        <button onClick={handleSubmit} disabled={loading}
+          className="w-full bg-yellow-400 text-black font-black py-3 rounded hover:bg-yellow-300 transition disabled:opacity-50">
+          {loading ? "Ανεβάζω..." : "Upload Resource"}
+        </button>
+      </div>
+    </main>
+  );
+}
