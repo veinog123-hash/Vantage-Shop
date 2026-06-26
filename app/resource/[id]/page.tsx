@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -32,7 +32,7 @@ export default function ResourcePage() {
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ resourceId: resource.id }),
+      body: JSON.stringify({ resourceId: resource!.id }),
     });
     const data = await res.json();
     if (data.url) window.location.href = data.url;
@@ -99,3 +99,4 @@ export default function ResourcePage() {
     </main>
   );
 }
+
