@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 export default function ResourcePage() {
   const { id } = useParams();
-  const [resource, setResource] = useState(null);
+  const [resource, setResource] = useState<any>(null);
   const [showPayment, setShowPayment] = useState(false);
 
   useEffect(() => {
