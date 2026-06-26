@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 export const dynamic = "force-dynamic";
 import { createClient } from "@supabase/supabase-js";
 import ResourceCard from "./ResourceCard";
@@ -42,7 +42,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <img src={session.user?.image || ""} className="w-8 h-8 rounded-full border border-yellow-400" />
             <span className="text-sm text-gray-300">{session.user?.name}</span>
-            <button onClick={() => signOut()} className="bg-[#1a1a1a] text-white px-3 py-2 rounded text-sm">Logout</button>
+            <button onClick={() => signOut()} className="bg-[#1a1a1a] text-white px-3 py-2 rounded text-sm hover:bg-[#222] transition">Logout</button>
           </div>
         ) : (
           <button onClick={() => signIn("discord")} className="bg-[#5865F2] text-white px-4 py-2 rounded font-bold text-sm hover:bg-[#4752c4] transition">Login με Discord</button>
@@ -79,4 +79,3 @@ export default function Home() {
     </main>
   );
 }
-
