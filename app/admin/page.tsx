@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -13,6 +13,7 @@ export default function AdminPage() {
   const [category, setCategory] = useState("Scripts");
   const [price, setPrice] = useState("0");
   const [isFree, setIsFree] = useState(true);
+  const [videoUrl, setVideoUrl] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [downloadFile, setDownloadFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -51,6 +52,7 @@ export default function AdminPage() {
       is_free: isFree,
       image_url: imageUrl,
       download_url: downloadUrl,
+      video_url: videoUrl || null,
       downloads: 0,
     });
 
@@ -59,6 +61,7 @@ export default function AdminPage() {
     setTitle("");
     setDescription("");
     setPrice("0");
+    setVideoUrl("");
     setImageFile(null);
     setDownloadFile(null);
   }
@@ -116,6 +119,13 @@ export default function AdminPage() {
           <label className="text-gray-400 text-sm mb-1 block">Εικόνα Preview</label>
           <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files?.[0] || null)}
             className="w-full bg-[#111] border border-[#222] rounded px-3 py-2 text-gray-400 text-sm" />
+        </div>
+
+        <div>
+          <label className="text-gray-400 text-sm mb-1 block">Video URL (YouTube/Streamable κλπ)</label>
+          <input value={videoUrl} onChange={e => setVideoUrl(e.target.value)}
+            className="w-full bg-[#111] border border-[#222] rounded px-3 py-2 text-white focus:outline-none focus:border-yellow-400"
+            placeholder="https://youtube.com/watch?v=..." />
         </div>
 
         <div>
