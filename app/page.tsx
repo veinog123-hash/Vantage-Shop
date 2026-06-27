@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 import { createClient } from "@supabase/supabase-js";
 import ResourceCard from "./ResourceCard";
 import { useState, useEffect } from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
  
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -11,6 +12,7 @@ const supabase = createClient(
 );
  
 export default function Home() {
+  const { data: session } = useSession();
   const [resources, setResources] = useState<any[]>([]);
   const [discord, setDiscord] = useState({ members: 0, online: 0 });
   const [search, setSearch] = useState("");
@@ -45,6 +47,15 @@ export default function Home() {
           <span className="text-yellow-400 font-black text-2xl tracking-widest">VANTAGE</span>
           <span className="text-[10px] bg-yellow-400 text-black font-black px-2 py-0.5 rounded ml-1">SHOP</span>
         </div>
+        {session ? (
+          <div className="flex items-center gap-3">
+            <img src={session.user?.image || ""} className="w-8 h-8 rounded-full border border-yellow-400" />
+            <span className="text-sm text-gray-300">{session.user?.name}</span>
+            <button onClick={() => signOut()} className="bg-[#1a1a1a] text-white px-3 py-2 rounded text-sm hover:bg-[#222] transition">Logout</button>
+          </div>
+        ) : (
+          <button onClick={() => signIn("discord")} className="bg-[#5865F2] text-white px-4 py-2 rounded font-bold text-sm hover:bg-[#4752c4] transition">Login με Discord</button>
+        )}
       </nav>
  
       <div className="px-6 py-10 border-b border-[#1a1a1a]">
@@ -72,10 +83,8 @@ export default function Home() {
       </div>
  
       <div className="px-6 py-6 flex gap-6">
-        {/* Sidebar */}
         <div className="w-52 shrink-0 space-y-3">
  
-          {/* Search */}
           <div className="bg-[#111] border border-[#1a1a1a] rounded-lg p-4">
             <div className="text-gray-500 text-xs mb-2 uppercase tracking-widest font-bold">Search</div>
             <input
@@ -86,7 +95,6 @@ export default function Home() {
             />
           </div>
  
-          {/* Sort */}
           <div className="bg-[#111] border border-[#1a1a1a] rounded-lg p-4">
             <div className="text-gray-500 text-xs mb-2 uppercase tracking-widest font-bold">Sort By</div>
             <select
@@ -100,7 +108,6 @@ export default function Home() {
             </select>
           </div>
  
-          {/* Pricing */}
           <div className="bg-[#111] border border-[#1a1a1a] rounded-lg p-4">
             <div className="text-gray-500 text-xs mb-2 uppercase tracking-widest font-bold">Pricing</div>
             <div className="flex gap-2">
@@ -114,7 +121,6 @@ export default function Home() {
             </div>
           </div>
  
-          {/* Category */}
           <div className="bg-[#111] border border-[#1a1a1a] rounded-lg p-4">
             <div className="text-gray-500 text-xs mb-2 uppercase tracking-widest font-bold">Category</div>
             <div className="space-y-1">
@@ -130,7 +136,6 @@ export default function Home() {
  
         </div>
  
-        {/* Resources */}
         <div className="flex-1">
           <div className="text-gray-600 text-xs mb-4 uppercase tracking-widest">{list.length} releases</div>
           {list.length === 0 ? (
