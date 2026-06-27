@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 export const dynamic = "force-dynamic";
 import { createClient } from "@supabase/supabase-js";
 import ResourceCard from "./ResourceCard";
@@ -79,3 +79,4 @@ export default function Home() {
     </main>
   );
 }
+
