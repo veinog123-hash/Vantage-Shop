@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
+import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+import { createClient } from "@supabase/supabase-js";
+
 const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 const supabase = createClient(
@@ -69,3 +73,4 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ url: session.url });
 }
+
