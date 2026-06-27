@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
     if (!record) return NextResponse.json({ error: "No record" }, { status: 400 });
 
-    const { title, description, category, price, is_free, image_url, id } = record;
+    const { title, description, category, price, is_free, image_url, video_url, id } = record;
 
     const priceText = is_free ? "**Free**" : `**${price}€**`;
     const shopUrl   = `${process.env.NEXTAUTH_URL}/resource/${id}`;
@@ -36,13 +36,34 @@ export async function POST(req: NextRequest) {
 
     if (image_url) embed.image = { url: image_url };
 
+    const components = [];
+    const buttons: any[] = [
+      {
+        type: 2,
+        style: 5,
+        label: "🛒 View Resource",
+        url: shopUrl,
+      }
+    ];
+
+    if (video_url) {
+      buttons.push({
+        type: 2,
+        style: 5,
+        label: "▶️ Watch Video",
+        url: video_url,
+      });
+    }
+
+    components.push({ type: 1, components: buttons });
+
     const res = await fetch(`https://discord.com/api/v10/channels/${NOTIFY_CHANNEL_ID}/messages`, {
       method: "POST",
       headers: {
         "Authorization": `Bot ${DISCORD_BOT_TOKEN}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ embeds: [embed] }),
+      body: JSON.stringify({ embeds: [embed], components }),
     });
 
     if (!res.ok) {
