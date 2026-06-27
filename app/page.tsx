@@ -58,10 +58,14 @@ export default function Home() {
         )}
       </nav>
  
-      <div className="px-6 py-10 border-b border-[#1a1a1a]">
+      <div className="px-6 py-14 border-b border-[#1a1a1a]">
         <div className="max-w-2xl">
-          <h1 className="text-4xl font-black mb-3 leading-tight">Premium FiveM Resources<br /><span className="text-yellow-400">για τον Server σου</span></h1>
-          <p className="text-gray-500 text-sm">Scripts, MLO, Vehicles & Clothing — επιλεγμένα και έτοιμα για χρήση.</p>
+          <div className="text-yellow-400 text-xs font-bold uppercase tracking-widest mb-3">🔥 Next-Gen FiveM Resources</div>
+          <h1 className="text-5xl font-black mb-4 leading-tight tracking-tight">
+            Build the Server<br />
+            <span className="text-yellow-400">Everyone Talks About.</span>
+          </h1>
+          <p className="text-gray-500 text-sm">Scripts • MLO • Vehicles • Clothing — χτισμένα για serious servers.</p>
         </div>
       </div>
  
@@ -149,5 +153,4 @@ export default function Home() {
       </div>
     </main>
   );
-}
- 
+
