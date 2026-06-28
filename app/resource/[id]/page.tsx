@@ -3,17 +3,23 @@ import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-
+ 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
-
+ 
+function getYoutubeEmbedUrl(url: string): string | null {
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (match) return `https://www.youtube.com/embed/${match[1]}`;
+  return null;
+}
+ 
 export default function ResourcePage() {
   const { id } = useParams();
   const [resource, setResource] = useState<any>(null);
   const [showPayment, setShowPayment] = useState(false);
-
+ 
   useEffect(() => {
     async function load() {
       const { data } = await supabase.from("resources").select("*").eq("id", id).single();
@@ -21,13 +27,13 @@ export default function ResourcePage() {
     }
     load();
   }, [id]);
-
+ 
   if (!resource) return (
     <main className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
       <div className="text-gray-500">Loading...</div>
     </main>
   );
-
+ 
   async function handleStripe() {
     const res = await fetch("/api/checkout", {
       method: "POST",
@@ -37,20 +43,32 @@ export default function ResourcePage() {
     const data = await res.json();
     if (data.url) window.location.href = data.url;
   }
-
+ 
+  const youtubeEmbed = resource.video_url ? getYoutubeEmbedUrl(resource.video_url) : null;
+ 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white">
       <nav className="border-b border-[#1a1a1a] px-6 py-4">
         <a href="/" className="text-yellow-400 font-black text-2xl tracking-widest">VANTAGE <span className="text-[10px] bg-yellow-400 text-black px-2 py-0.5 rounded">SHOP</span></a>
       </nav>
       <div className="max-w-4xl mx-auto px-6 py-10">
-        <div className="w-full h-72 bg-[#111] rounded-xl overflow-hidden mb-8">
-          {resource.image_url ? (
-            <img src={resource.image_url} className="w-full h-full object-cover" />
+ 
+        {/* Preview: video αν υπαρχει, αλλιως εικονα */}
+        <div className="w-full rounded-xl overflow-hidden mb-8 bg-[#111]">
+          {youtubeEmbed ? (
+            <iframe
+              src={youtubeEmbed}
+              className="w-full h-72"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : resource.image_url ? (
+            <img src={resource.image_url} className="w-full h-72 object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-600">No Preview</div>
+            <div className="w-full h-72 flex items-center justify-center text-gray-600">No Preview</div>
           )}
         </div>
+ 
         <div className="flex gap-8">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-3">
@@ -99,4 +117,4 @@ export default function ResourcePage() {
     </main>
   );
 }
-
+ 
